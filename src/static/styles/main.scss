@@ -6,5 +6,29 @@
 @import "theme/login";
 @import "theme/navbar";
 @import "theme/footer";
-
 @import "utils/margins";
+
+//Overriding CSS rules
+
+.nav {
+  padding-top:5vh;
+  li {
+    border-radius: 7px;
+    border: 1px solid #888888;
+    box-shadow: 2px 2px #888888;
+    margin-right: 2vw;
+  }
+  li:hover {
+    box-shadow: 2px 2px #232323;
+    border: 1px solid #f39c12;
+  }
+  li:active {
+    box-shadow: 2px 2px #232323;
+  }
+}
+
+.navbar-default {
+  background: transparent;
+  background-color: transparent;
+  border:none;
+}

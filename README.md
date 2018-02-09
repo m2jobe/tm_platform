@@ -119,11 +119,11 @@ Stop Docker development server and remove containers, networks, volumes, and ima
 You can access shell in a container
 
 * `$ docker ps  # get the name from the list of running containers`
-* `$ docker exec -i -t djangoreactreduxbase_frontend_1 /bin/bash`
+* `$ docker exec -i -t tmbase_frontend_1 /bin/bash`
 
 The database can be accessed @localhost:5433
 
-* `$ psql -h localhost -p 5433 -U djangoreactredux djangoreactredux_dev`
+* `$ psql -h localhost -p 5433 -U tm tm_dev`
 
 
 ## Accessing Website
