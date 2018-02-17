@@ -1,7 +1,7 @@
 from tm.settings.base import *  # NOQA (ignore all errors on this line)
 
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 PAGE_CACHE_SECONDS = 60
@@ -12,10 +12,10 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'tm_prod',
-        'USER': 'tm',
-        'PASSWORD': 'password',
-        'HOST': 'postgres',
+        'NAME': 'tourmonkeys_db',
+        'USER': 'tourmonkeys',
+        'PASSWORD': 't0urTeam',
+        'HOST': 'tourmonkeysdbinstance.cbjveiv1grwa.us-east-2.rds.amazonaws.com',
         'PORT': 5432,
     }
 }

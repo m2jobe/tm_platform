@@ -2,26 +2,39 @@ import React from 'react';
 import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-
+import { bindActionCreators } from 'redux';
+import * as actionCreators from '../../actions/home';
 import './style.scss';
 import reactLogo from './images/react-logo.png';
 import tourLogo from './images/tour-logo.png';
+import rockConcert from './images/rock-concert.jpg';
 
 class HomeView extends React.Component {
     static propTypes = {
         statusText: PropTypes.string,
         userName: PropTypes.string,
-        dispatch: PropTypes.func.isRequired
+      //  dispatch: PropTypes.func.isRequired,
+        homeVideos: PropTypes.array,
     };
 
     static defaultProps = {
         statusText: '',
-        userName: ''
+        userName: '',
+        homeVideos: null
     };
 
     goToProtected = () => {
         this.props.dispatch(push('/protected'));
     };
+
+    componentWillMount() {
+      //fetch home videos
+      //this.props.actions.fetchHomeVideos();
+    }
+
+    componentDidMount() {
+      this.props.actions.fetchHomeVideos();
+    }
 
     render() {
         return (
@@ -63,7 +76,7 @@ class HomeView extends React.Component {
                 </div>
               </div>
 
-                <section className="jumbotron text-center">
+                <section style={{backgroundImage: './images/rock-concert.jpg'}} className="jumbotron text-center">
                   <div className="container">
                     <img className="page-logo margin-bottom-medium"
                         src={tourLogo}
@@ -346,9 +359,17 @@ class HomeView extends React.Component {
 const mapStateToProps = (state) => {
     return {
         userName: state.auth.userName,
-        statusText: state.auth.statusText
+        statusText: state.auth.statusText,
+        homeVideos: state.home.homeVideos
     };
 };
 
-export default connect(mapStateToProps)(HomeView);
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        actions: bindActionCreators(actionCreators, dispatch)
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeView);
 export { HomeView as HomeViewNotConnected };
