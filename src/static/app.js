@@ -49,7 +49,7 @@ class App extends React.Component {
         });
 
         return (
-            <div className="app">
+            <div className="">
                 <div>
                     {this.props.children}
                 </div>

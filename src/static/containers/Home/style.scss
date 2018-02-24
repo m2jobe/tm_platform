@@ -37,3 +37,186 @@ footer p {
 }
 
 .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
+
+#homeBackImage {
+  background-image : url('./images/rockcert.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: none !important;
+  border-radius: 0px !important;
+}
+
+.navbar {
+  margin-bottom: 0px !important;
+}
+
+.homepage-text {
+  color: rgba(0, 0, 0, 0.57) !important;
+  text-shadow: -2px 2px 2px rgba(255, 255, 255, 0.83);
+  font-weight: 800;
+}
+
+#videoTeaser {
+
+}
+
+.card {
+  border: none !important;
+}
+
+#creatorsDiv {
+  background: #232323;  /* fallback for old browsers */
+  border-radius: 0px !important;
+}
+
+.peoplesRhymer {
+  width:100%;
+  height:100%;
+}
+
+.footer-info {
+  color: #282828 !important;
+  font-weight: 700;
+}
+
+.thumb {position: relative;}
+.thumb a {position: absolute; top: 0; display: block; width: 100%; height: 100%; text-align: center; text-decoration: none;}
+.thumb a .play, .thumb a .overlay {opacity: 0;}
+.thumb a:hover .play, .thumb a:hover .overlay {display: block; transition: opacity .25s ease-in-out;-moz-transition: opacity .25s ease-in-out;-webkit-transition: opacity .25s ease-in-out;}
+.thumb a:hover .play {position: relative; font-size: 64px; color: #ffffff; margin-top: 60px; z-index: 1000; opacity: 1;}
+.thumb a:hover .overlay {position: absolute; top: 0; width: 100%; height: 100%; background-color: #000000; opacity: .7;}
+
+.ReactModal__Content {
+  padding: 0px !important
+}
+
+.ReactModal__Overlay {
+  background-color: rgba(0, 0, 0, 0.50) !important;
+}
+
+.form-body{
+    background:#fff;
+    padding:20px;
+}
+.login-form{
+    background:rgba(255,255,255,0.8);
+	padding:20px;
+	border-top:3px solid#3e4043;
+}
+.innter-form{
+	padding-top:20px;
+}
+.final-login li{
+	width:50%;
+}
+
+.nav-tabs {
+    border-bottom: none !important;
+}
+
+.nav-tabs>li{
+	color:#222 !important;
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    color: #fff;
+    background-color: #d14d42;
+    border: none !important;
+    border-bottom-color: transparent;
+	border-radius:none !important;
+}
+.nav-tabs>li>a {
+    margin-right: 2px;
+    line-height: 1.428571429;
+    border: none !important;
+    border-radius:none !important;
+	text-transform:uppercase;
+	font-size:16px;
+}
+
+.social-login{
+	text-align:center;
+	font-size:12px;
+}
+.social-login p{
+	margin:15px 0;
+}
+.social-login ul{
+	margin:0;
+	padding:0;
+	list-style-type:none;
+}
+.social-login ul li{
+	width:33%;
+	float:left;
+    clear:fix;
+}
+.social-login ul li a{
+	font-size:13px;
+	color:#fff;
+	text-decoration:none;
+	padding:10px 0;
+	display:block;
+}
+.social-login ul li:nth-child(1) a{
+	background:#3b5998;
+}
+.social-login ul li:nth-child(2) a{
+	background:#e74c3d;
+}
+.social-login ul li:nth-child(3) a{
+	background:#3698d9;
+}
+.sa-innate-form input[type=text], input[type=password], input[type=file], textarea, select, email{
+    font-size:13px;
+	padding:10px;
+	border:1px solid#ccc;
+	outline:none;
+	width:100%;
+	margin:8px 0;
+
+}
+.sa-innate-form input[type=submit]{
+    border:1px solid#e64b3b;
+	background:#e64b3b;
+	color:#fff;
+	padding:10px 25px;
+	font-size:14px;
+	margin-top:5px;
+	}
+	.sa-innate-form input[type=submit]:hover{
+	border:1px solid#db3b2b;
+	background:#db3b2b;
+	color:#fff;
+	}
+
+	.sa-innate-form button{
+	border:1px solid#e64b3b;
+	background:#e64b3b;
+	color:#fff;
+	padding:10px 25px;
+	font-size:14px;
+	margin-top:5px;
+	}
+	.sa-innate-form button:hover{
+	border:1px solid#db3b2b;
+	background:#db3b2b;
+	color:#fff;
+	}
+    .sa-innate-form p{
+        font-size:13px;
+        padding-top:10px;
+    }
+
+
+.form-body > .nav {
+   display: block;
+   display: -webkit-box;
+}
+
+.card-nav-tabs {
+  margin-top: 20px
+}
+
+.play:hover {
+  cursor: pointer
+}

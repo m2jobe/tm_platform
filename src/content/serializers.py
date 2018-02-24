@@ -6,16 +6,21 @@ from content.models import Artist
 
 from lib.utils import validate_email as email_is_valid
 
+class LivestreamThumbnailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Video
+        fields = ('streamName', 'streamDuration', 'streamAuthor', 'streamDate', 'streamURL', 'streamViews', 'streamLikes', 'streamDescription')
+
 
 class VideoThumbnailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ('streamName', 'streamArtist', 'streamAuthor', 'streamDate', 'streamURL', 'streamViews')
+        fields = ('streamName', 'streamDuration', 'streamAuthor', 'streamDate', 'streamURL', 'streamViews', 'streamLikes', 'streamDescription')
 
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ('id','name', 'artist', 'url', 'description', 'date_added', 'setList', 'setListTime')
+        fields = ('id','name', 'artist', 'url', 'description', 'date_added', 'setList', 'setListTime', 'streamFee')
 
 
 class ArtistSerializer(serializers.ModelSerializer):
