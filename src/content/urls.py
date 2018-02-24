@@ -14,4 +14,10 @@ urlpatterns = [
     url(_(r'^fetchHomeLivestream/$'),
         csrf_exempt(content.views.FetchHomeLivestream.as_view()),
         name='fetch_livestream'),
+    url(_(r'^fetchRecommendations/$'),
+        csrf_exempt(content.views.FetchRecommendations.as_view()),
+        name='fetch_recommended_videos'),
+    url(_(r'^fetchVideo/$'),
+        csrf_exempt(content.views.FetchVideo.as_view()),
+        name='fetchVideo'),
 ]

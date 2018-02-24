@@ -52,6 +52,37 @@ class FetchHomeVideo(GenericAPIView):
 
         return Response(data, status=status.HTTP_200_OK)
 
+class FetchVideo(GenericAPIView):
+    authentication_classes = ()
+    serializer_class = VideoThumbnailSerializer
+
+    def post(self, request):
+        """Process GET request and return protected data."""
+        queryset = Video.objects.filter(streamURL=request.data['videoID'])
+        serializer = VideoThumbnailSerializer(queryset, many=True)
+        data = serializer.data
+#        queryset = Objective.objects.filter(username=request.data['username'], date__lte=request.data['endDate'], date__gte = request.data['startDate']).order_by('-id')
+        #video = Video(name="asdf", artist='username', url="2015-05-05", description='objective', shots='note', date_added='2015-05-05 00:00:00', date_updated='2015-05-05 00:00:00')
+        #video.save()
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class FetchRecommendations(GenericAPIView):
+    authentication_classes = ()
+    serializer_class = VideoThumbnailSerializer
+
+    def post(self, request):
+        """Process GET request and return protected data."""
+        queryset = Video.objects.all().order_by("-date_added")[:4]
+        serializer = VideoThumbnailSerializer(queryset, many=True)
+        data = serializer.data
+#        queryset = Objective.objects.filter(username=request.data['username'], date__lte=request.data['endDate'], date__gte = request.data['startDate']).order_by('-id')
+        #video = Video(name="asdf", artist='username', url="2015-05-05", description='objective', shots='note', date_added='2015-05-05 00:00:00', date_updated='2015-05-05 00:00:00')
+        #video.save()
+
+        return Response(data, status=status.HTTP_200_OK)
+
 
 class RequestLivestream(GenericAPIView):
     authentication_classes = ()

@@ -8,24 +8,37 @@ import { routerMiddleware } from 'react-router-redux';
 
 import rootReducer from '../reducers';
 import DevTools from '../containers/Root/DevTools';
-import { reactReduxFirebase } from 'react-redux-firebase';
-import firebase from 'firebase';
+import { reactReduxFirebase } from 'react-redux-firebase'
+import firebase from 'firebase'
+
 
 export default function configureStore(initialState, history) {
   const firebaseConfig = {
-    apiKey: 'AIzaSyCEGrB5pNfGqz_dgXCVuNVL_oBHZatf03E',
+    apiKey: "AIzaSyCEGrB5pNfGqz_dgXCVuNVL_oBHZatf03E",
     authDomain: "tour-monkeys.firebaseapp.com",
     databaseURL: "https://tour-monkeys.firebaseio.com",
+    projectId: "tour-monkeys",
     storageBucket: "tour-monkeys.appspot.com",
+    messagingSenderId: "740014348124"
   }
-  // react-redux-firebase options
-  const config = {
+
+  // react-redux-firebase config
+  const rrfConfig = {
     userProfile: 'users', // firebase root where user profiles are stored
-    enableLogging: false, // enable/disable Firebase's database logging
+    attachAuthIsReady: true, // attaches auth is ready promise to store
+    firebaseStateName: 'firebase' // should match the reducer name ('firebase' is default)
   }
-
-
+  // initialize firebase instance
   firebase.initializeApp(firebaseConfig) // <- new to v2.*.*
+
+  // initialize firestore
+  // firebase.firestore() // <- needed if using firestore
+
+  // Add reduxReduxFirebase enhancer when making store creator
+  const createStoreWithFirebase = compose(
+    reactReduxFirebase(firebase, rrfConfig), // firebase instance as first argument
+    // reduxFirestore(firebase) // <- needed if using firestore
+  )(createStore)
 
     const logger = createLogger();
 
@@ -39,18 +52,9 @@ export default function configureStore(initialState, history) {
         DevTools.instrument()
     );
 
-
-      // Add redux Firebase to compose
-      const createStoreWithFirebase = compose(
-        reactReduxFirebase(firebase, config)
-      )(createStore)
-
-      // Create store with reducers and initial state
-
     // Add the reducer to your store on the `router` key
     // Also apply our middleware for navigating
-    //const store = createStore(rootReducer, initialState, middlewareWithDevTools);
-      const store = createStoreWithFirebase(rootReducer, initialState, middlewareWithDevTools)
+    const store = createStoreWithFirebase(rootReducer, initialState, middlewareWithDevTools);
 
     if (module.hot) {
         module.hot
@@ -61,5 +65,8 @@ export default function configureStore(initialState, history) {
             });
     }
 
+    store.firebaseAuthIsReady.then(() => {
+      console.log('Auth has loaded') // eslint-disable-line no-console
+    })
     return store;
 }

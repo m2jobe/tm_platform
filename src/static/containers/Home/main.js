@@ -13,24 +13,17 @@ import creatorDiv from './images/creatordiv.png';
 import ReactTooltip from 'react-tooltip'
 import Modal from 'react-modal';
 import TextOverflowTooltip from 'react-text-overflow-tooltip';
-import '../../../../node_modules/react-text-overflow-tooltip/lib/react-text-overflow-tooltip.css'
-
+import '../../../../node_modules/react-text-overflow-tooltip/lib/react-text-overflow-tooltip.css';
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
+import firebase from 'firebase';
+import { compose } from 'redux';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
 const customStyles = {
   content : {
     top                   : '50%',
     left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)',
-    width:'80%',
-  }
-};
 
-const customStyles2 = {
-  content : {
-    top                   : '50%',
-    left                  : '50%',
     right                 : 'auto',
     bottom                : 'auto',
     marginRight           : '-50%',
@@ -42,7 +35,7 @@ class MainView extends React.Component {
     static propTypes = {
         statusText: PropTypes.string,
         userName: PropTypes.string,
-      //  dispatch: PropTypes.func.isRequired,
+        dispatch: PropTypes.func.isRequired,
         homeVideos: PropTypes.array,
         upcomingStreams: PropTypes.array,
         livestreamRequested: PropTypes.string
@@ -61,11 +54,10 @@ class MainView extends React.Component {
       };
 
       this.playVideo = this.playVideo.bind(this);
-      this.afterOpenModal = this.afterOpenModal.bind(this);
-      this.closeModal = this.closeModal.bind(this);
       this.afterOpenModal2 = this.afterOpenModal2.bind(this);
       this.closeModal2 = this.closeModal2.bind(this);
       this.openModal2 = this.openModal2.bind(this);
+
       this.afterOpenModal3 = this.afterOpenModal3.bind(this);
       this.closeModal3 = this.closeModal3.bind(this);
       this.openModal3 = this.openModal3.bind(this);
@@ -73,22 +65,58 @@ class MainView extends React.Component {
 
     }
 
+
+
+
+
+    login = () => {
+        var password = $('#pwds').val();
+        var email = $('#usrd').val();
+        if (email && password) {
+            firebase.login({
+              email: email,
+              password: password
+            })
+        }
+    };
+
+    signUp = () => {
+      var password = $('#password').val();
+      var email = $('#email').val();
+      var displayName = $('#username').val();
+
+      if (username && password && email) {
+          //this.props.actions.authRegisterUser(email, password, password, username, this.state.redirectTo);
+          //delete above line
+          firebase.createUser(
+            { email, password },
+            { displayName, email }
+          )
+      }
+    }
+
+    playVideoLivestream(streamURL) {
+      //window.location.replace("player/"+streamURL)
+        NotificationManager.warning("Details coming soon", '');
+
+    }
+
+
     playVideo(streamURL) {
-      this.setState({modalIsOpen: true, currentURL: streamURL});
+      //window.location.replace("player/"+streamURL)
+      if(this.props.firebase.auth.email) {
+        this.props.dispatch(push('/player/'+streamURL));
+      } else {
+        this.openModal2();
+        NotificationManager.warning("Login Now to watch", '');
+      }
+
     }
 
     openModal2() {
       this.setState({modalIsOpen2: true});
     }
 
-    openModal3() {
-      this.setState({modalIsOpen3: true});
-    }
-
-
-    afterOpenModal() {
-      // references are now sync'd and can be accessed.
-    }
 
     closeModal2() {
       this.setState({modalIsOpen2: false});
@@ -98,6 +126,11 @@ class MainView extends React.Component {
       // references are now sync'd and can be accessed.
     }
 
+    openModal3() {
+      this.setState({modalIsOpen3: true});
+    }
+
+
     closeModal3() {
       this.setState({modalIsOpen3: false});
     }
@@ -105,13 +138,6 @@ class MainView extends React.Component {
     afterOpenModal3() {
       // references are now sync'd and can be accessed.
     }
-
-
-    closeModal() {
-      this.setState({modalIsOpen: false});
-    }
-
-
 
     static defaultProps = {
         statusText: '',
@@ -125,11 +151,13 @@ class MainView extends React.Component {
     };
 
     componentWillMount() {
-      //fetch home videos
-      //this.props.actions.fetchHomeVideos();
+
+
     }
 
+
     componentDidMount() {
+      window.scrollTo(0, 0);
       this.props.actions.fetchHomeVideos();
       this.props.actions.fetchHomeLivestream();
 
@@ -139,6 +167,21 @@ class MainView extends React.Component {
       if(prevProps.livestreamRequested != this.props.livestreamRequested) {
         alert("Request sent.");
         window.location.reload();
+      }
+      if(prevProps.firebase.authError != this.props.firebase.authError) {
+        NotificationManager.success(this.props.firebase.authError.message, 'Error authenticating');
+      }
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+      if(!this.props.firebase.auth.email) {
+        if(nextProps.firebase.auth.email && this.props.firebase.auth.email != nextProps.firebase.auth.email) {
+          this.closeModal2();
+        }
+      } else {
+        if(!nextProps.firebase.auth.email) {
+          this.closeModal3();
+        }
       }
     }
 
@@ -155,6 +198,28 @@ class MainView extends React.Component {
       }
 
     }
+
+    logout = () => {
+        firebase.logout()
+    };
+
+    triggerForgotPassword() {
+      $('#triggerForgotDiv').show();
+    }
+
+    recoverPasword () {
+      var emailAddress = $('#recoveryEmail').val();
+      var auth = firebase.auth();
+      auth.sendPasswordResetEmail(emailAddress).then(function() {
+        // Email sent.
+        NotificationManager.success("Recovery email sent.", '');
+      }).catch(function(error) {
+        // An error happened.
+        console.log(error);
+        NotificationManager.error(error, error.message);
+      });
+    }
+
     render() {
         var myBigGreenDialog = {
           backgroundColor: '#00897B',
@@ -167,6 +232,108 @@ class MainView extends React.Component {
 
         return (
           <div>
+            <Modal
+              ariaHideApp={false}
+              isOpen={this.state.modalIsOpen3}
+              onAfterOpen={this.afterOpenModal3}
+              onRequestClose={this.closeModal3}
+              style={customStyles}
+              contentLabel="Logout Modal"
+            >
+              <div style={{width: 'max-content'}} className="container">
+              <button onClick={this.closeModal3} type="button" style={{padding:'1vh', fontSize:'16px'}} className="close pull-right" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                <div style={{width:'35vw'}} className="row">
+                    <div className="form-body">
+                      <div className="tab-content">
+                        <div id="sectionA" className="tab-pane fade in active">
+                          <div className="social-login">
+                            <ul>
+                              <li style={{width:'100%'}} ><a onClick={this.logout}><i className="fa fa-sign-out" /> Logout</a></li>
+                            </ul>
+                          </div>
+                          <div className="clearfix" />
+                        </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </Modal>
+            <Modal
+              ariaHideApp={false}
+              isOpen={this.state.modalIsOpen2}
+              onAfterOpen={this.afterOpenModal2}
+              onRequestClose={this.closeModal2}
+              style={customStyles}
+              contentLabel="Login Modal"
+            >
+              <div style={{width: 'max-content'}} className="container">
+              <button onClick={this.closeModal2} type="button" style={{padding:'1vh', fontSize:'16px'}} className="close pull-right" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                <div style={{paddingBottom:'20px'}} className="row">
+                    <div className="form-body">
+                      <ul style={{display:'-webkit-box !important'}} className="nav nav-tabs final-login">
+                        <li style={{display:'inline'}} className="active"><a data-toggle="tab" href="#sectionA">Sign In</a></li>
+                        <li style={{display:'inline'}} ><a data-toggle="tab" href="#sectionB">Join us!</a></li>
+                      </ul>
+                      <div className="tab-content">
+                        <div id="sectionA" className="tab-pane fade in active">
+                          <div className="innter-form">
+                            <div className="sa-innate-form" method="post">
+                              <label>Email Address</label>
+                              <input type="text" id="usrd" name="username" />
+                              <label>Password</label>
+                              <input type="password" id="pwds" name="password" />
+                              <button onClick={this.login} >Sign In</button><br/><br/>
+                              <a onClick={this.triggerForgotPassword}>Forgot Password?</a>
+                              <div style={{display:'none'}} id="triggerForgotDiv" >
+                                <br/><br/>
+                                <label>Enter Email Address to get recovery steps</label>
+                                <input type="text" id="recoveryEmail" name="recoveryEmail" />
+                                <button onClick={this.recoverPasword} >Recover Password</button>
+                                <br/><br/>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="social-login">
+                            <p>- - - - - - - - - - - - - Sign In With - - - - - - - - - - - - - </p>
+                            <ul>
+                              <li><a  onClick={() => firebase.login({ provider: 'facebook', type: 'popup' })}><i className="fa fa-facebook" /> Facebook</a></li>
+                              <li><a  onClick={() => firebase.login({ provider: 'google', type: 'popup' })}><i className="fa fa-google-plus" /> Google+</a></li>
+                              <li><a  onClick={() => firebase.login({ provider: 'twitter', type: 'popup' })}><i className="fa fa-twitter" /> Twitter</a></li>
+                            </ul>
+                          </div>
+                          <div className="clearfix" />
+                        </div>
+                        <div id="sectionB" className="tab-pane fade">
+                          <div className="innter-form">
+                            <div className="sa-innate-form" method="post">
+                              <label>Name</label>
+                              <input type="text" id="username" name="username" />
+                              <label>Email Address</label>
+                              <input type="text" id="email" name="email" />
+                              <label>Password</label>
+                              <input type="password" id="password" name="password" />
+                              <button onClick={this.signUp} >Join now</button><br/><br/>
+                              <p>By clicking Join now, you agree to hifriendss User Agreement, Privacy Policy, and Cookie Policy.</p>
+                            </div>
+                          </div>
+                          <div className="social-login">
+                            <p>- - - - - - - - - - - - - Register With - - - - - - - - - - - - - </p>
+                            <ul>
+                              <li><a  onClick={() => firebase.login({ provider: 'facebook', type: 'popup' })}><i className="fa fa-facebook" /> Facebook</a></li>
+                              <li><a  onClick={() => firebase.login({ provider: 'google', type: 'popup' })}><i className="fa fa-google-plus" /> Google+</a></li>
+                              <li><a  onClick={() => firebase.login({ provider: 'twitter', type: 'popup' })}><i className="fa fa-twitter" /> Twitter</a></li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </Modal>
             <nav className="navbar navbar-transparent navbar-fixed-top navbar-color-on-scroll">
               <div className="container">
                 <div className="navbar-header">
@@ -176,48 +343,38 @@ class MainView extends React.Component {
                     <span className="icon-bar" />
                     <span className="icon-bar" />
                   </button>
-                  <a href="http://www.creative-tim.com">
+                  <a href="#">
                     <div className="logo-container">
                       <div className="logo">
-                        <img src="assets/img/logo.png" alt="Creative Tim Logo" rel="tooltip" title="<b>Material Kit</b> was Designed & Coded with care by the staff from <b>Creative Tim</b>" data-placement="bottom" data-html="true" />
-                      </div>
-                      <div className="brand">
-                        Tourmonkeys
+                        <img src={tourLogo} alt="Tourmonkeys Livesteam Logo" data-placement="bottom" data-html="true" />
                       </div>
                     </div>
                   </a>
                 </div>
                 <div className="collapse navbar-collapse" id="navigation-index">
-                  <ul className="nav navbar-nav navbar-right">
+                  <div className="nav navbar-nav navbar-right">
                     <li>
-                      <a href="#pablo"><i className="material-icons">email</i></a>
+                      {this.props.firebase.auth.email ?
+                        <a onClick={this.openModal3}><i className="material-icons">face</i>
+                        {this.props.firebase.auth.displayName
+                          ?
+                          this.props.firebase.auth.displayName
+                          :
+                          this.props.firebase.auth.email
+                        }
+
+                        </a>
+                        :
+                        <a onClick={this.openModal2}><i className="material-icons">face</i> login</a>
+                      }
                     </li>
-                    <li>
-                      <a href="#pablo"><i className="material-icons">face</i></a>
-                    </li>
-                    <li className="dropdown">
-                      <a href="#" className="dropdown-toggle" data-toggle="dropdown">
-                        <i className="material-icons">settings</i>
-                        <b className="caret" />
-                      </a>
-                      <ul className="dropdown-menu dropdown-menu-right">
-                        <li className="dropdown-header">Dropdown header</li>
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li className="divider" />
-                        <li><a href="#">Separated link</a></li>
-                        <li className="divider" />
-                        <li><a href="#">One more separated link</a></li>
-                      </ul>
-                    </li>
-                  </ul>
+                  </div>
                 </div>
               </div>
             </nav>
             {/* End Navbar */}
             <div className="wrapper">
-              <div className="header header-filter" style={{backgroundImage: 'url("assets/img/bg2.jpeg")'}}>
+              <div className="header header-filter">
                 <div className="container">
                   <div className="row">
                     <div className="col-md-8 col-md-offset-2">
@@ -241,9 +398,9 @@ class MainView extends React.Component {
                        return (
                          <div key={idx} className="col-md-4">
                            <div className="title">
-                             <TextOverflowTooltip maxWidth="100%" style={{fontSize: '1.1vw'}}> <h3>{video.streamName}</h3> </TextOverflowTooltip>
+                             <TextOverflowTooltip id={video.streamURL + "_tooltip"} maxWidth="100%" style={{fontSize: '1.1vw'}}> <h3>{video.streamName}</h3> </TextOverflowTooltip>
                              <div className="thumb">
-                               <a onClick={() => this.playVideo(video.streamURL)}>
+                               <a onClick={() => this.playVideoLivestream(video.streamURL)}>
                                  <span className="play">►</span>
                                  <div className="overlay" />
                                </a>
@@ -284,10 +441,10 @@ class MainView extends React.Component {
                              <div style={{marginTop: '-3vh'}} className="content">
                                <div className="tab-content text-center">
                                  <div className="tab-pane active" id={"profile"+video.streamURL}>
-                                   <button className="btn btn-primary btn-round">
+                                   <button style={{border: 'none'}} className="btn btn-primary btn-round">
                                      <i className="material-icons">remove_red_eyes</i> {video.streamViews} Views
                                    </button>
-                                   <button className="btn btn-primary btn-round">
+                                   <button style={{border: 'none'}} className="btn btn-primary btn-round">
                                      <i className="material-icons">star</i> {video.streamLikes} Likes
                                    </button>
                                  </div>
@@ -320,7 +477,7 @@ class MainView extends React.Component {
                        return (
                          <div key={idx} className="col-md-4">
                            <div className="title">
-                             <TextOverflowTooltip maxWidth="100%" style={{fontSize: '1.1vw'}}> <h3>{video.streamName}</h3> </TextOverflowTooltip>
+                             <TextOverflowTooltip id={video.streamURL + "_tooltip"} maxWidth="100%" style={{fontSize: '1.1vw'}}> <h3>{video.streamName}</h3> </TextOverflowTooltip>
                              <div className="thumb">
                                <a onClick={() => this.playVideo(video.streamURL)}>
                                  <span className="play">►</span>
@@ -363,10 +520,10 @@ class MainView extends React.Component {
                              <div style={{marginTop: '-3vh'}} className="content">
                                <div className="tab-content text-center">
                                  <div className="tab-pane active" id={"profile"+video.streamURL}>
-                                   <button className="btn btn-primary btn-round">
+                                   <button style={{border: 'none'}} className="btn btn-primary btn-round">
                                      <i className="material-icons">remove_red_eyes</i> {video.streamViews} Views
                                    </button>
-                                   <button className="btn btn-primary btn-round">
+                                   <button  style={{border: 'none'}} className="btn btn-primary btn-round">
                                      <i className="material-icons">star</i> {video.streamLikes} Likes
                                    </button>
                                  </div>
@@ -392,31 +549,22 @@ class MainView extends React.Component {
                     <div className="row text-center">
                       <div className="col-md-8 col-md-offset-2">
                         <h2>Do you love Tourmonkeys?</h2>
-                        <h4>If you love the Tourmonkeys platform and what we do please leave us a quick review here</h4>
-                      </div>
-                      <div className="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4">
-                        <a href="http://www.creative-tim.com/product/material-kit" className="btn btn-primary btn-lg">
-                          <i className="material-icons">cloud_download</i> Leave Review
-                        </a>
+                        <h4>If you love the Tourmonkeys platform and what we do please give us a follow on our social mdia</h4>
                       </div>
                     </div>
                     <div className="row sharing-area text-center">
                       <h3>Thank you for supporting us!</h3>
-                      <a href="#" className="btn btn-twitter">
+                      <a href="https://twitter.com/tourmonkeys" target="_blank" className="btn btn-twitter">
                         <i className="fa fa-twitter" />
                         Tweet
                       </a>
-                      <a href="#" className="btn btn-facebook">
+                      <a href="https://www.facebook.com/tourmonkeys/"  target="_blank" className="btn btn-facebook">
                         <i className="fa fa-facebook-square" />
-                        Share
+                        Like
                       </a>
-                      <a href="#" className="btn btn-google-plus">
-                        <i className="fa fa-google-plus" />
-                        Share
-                      </a>
-                      <a href="#" className="btn btn-github">
-                        <i className="fa fa-github" />
-                        Star
+                      <a href="instagram.com/tourmonkeys" target="_blank" className="btn btn-google-plus">
+                        <i className="fa fa-instagram" />
+                        Follow
                       </a>
                     </div>
                   </div>
@@ -454,6 +602,7 @@ class MainView extends React.Component {
                 </div>
               </footer>
             </div>
+            <NotificationContainer/>
           </div>
         );
     }
@@ -465,16 +614,19 @@ const mapStateToProps = (state) => {
         statusText: state.auth.statusText,
         homeVideos: state.home.homeVideos,
         upcomingStreams: state.home.upcomingStreams,
-        livestreamRequested: state.home.livestreamRequested
+        livestreamRequested: state.home.livestreamRequested,
+        firebase: state.firebase,
+        auth: state.firebase.auth
     };
 };
 
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        dispatch,
         actions: bindActionCreators(actionCreators, dispatch)
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(MainView);
-export { MainView as HomeViewNotConnected };
+export default compose(firebaseConnect(),connect(mapStateToProps, mapDispatchToProps))(MainView);
+export { MainView as MainViewNotConnected };

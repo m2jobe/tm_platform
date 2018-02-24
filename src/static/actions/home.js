@@ -3,7 +3,7 @@ import { push } from 'react-router-redux';
 
 import { SERVER_URL } from '../utils/config';
 import { checkHttpStatus, parseJSON } from '../utils';
-import { HOME_LIVESTREAM_FETCHED, REQUEST_LIVESTREAWM, HOME_VIDEOS_FETCHED } from '../constants';
+import { VIDEO_FETCHED, RECOMMENDED_LIVESTREAM_FETCHED, HOME_LIVESTREAM_FETCHED, REQUEST_LIVESTREAWM, HOME_VIDEOS_FETCHED } from '../constants';
 
 
 export function homeVideosFetched(data) {
@@ -14,9 +14,28 @@ export function homeVideosFetched(data) {
         }
     };
 }
+
+export function recommendedVideosFetched(data) {
+    return {
+        type: RECOMMENDED_LIVESTREAM_FETCHED,
+        payload: {
+            data
+        }
+    };
+}
+
 export function homeLivestreamFetched(data) {
     return {
         type: HOME_LIVESTREAM_FETCHED,
+        payload: {
+            data
+        }
+    };
+}
+
+export function videoFetched(data) {
+    return {
+        type: VIDEO_FETCHED,
         payload: {
             data
         }
@@ -49,6 +68,30 @@ function getCookie(name) {
     return cookieValue;
 }
 
+export function fetchVideo(videoID) {
+    return (dispatch, state) => {
+      return fetch(`${SERVER_URL}/api/v1/content/fetchVideo/`, {
+          method: 'post',
+          credentials: "same-origin",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              //"X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({videoID: videoID})
+      })
+            .then(checkHttpStatus)
+            .then(parseJSON)
+            .then((response) => {
+                dispatch(videoFetched(response));
+            })
+            .catch((error) => {
+                return Promise.resolve(); // TODO: we need a promise here because of the tests, find a better way
+            });
+    };
+}
+
+
 export function fetchHomeVideos() {
     return (dispatch, state) => {
       return fetch(`${SERVER_URL}/api/v1/content/fetchHomeVideos/`, {
@@ -64,6 +107,28 @@ export function fetchHomeVideos() {
             .then(parseJSON)
             .then((response) => {
                 dispatch(homeVideosFetched(response));
+            })
+            .catch((error) => {
+                return Promise.resolve(); // TODO: we need a promise here because of the tests, find a better way
+            });
+    };
+}
+
+export function fetchRecommendations(videoID, numberofVidstofetch) {
+    return (dispatch, state) => {
+      return fetch(`${SERVER_URL}/api/v1/content/fetchRecommendations/`, {
+          method: 'post',
+          credentials: "same-origin",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              //"X-CSRFToken": getCookie("csrftoken"),
+          }
+      })
+            .then(checkHttpStatus)
+            .then(parseJSON)
+            .then((response) => {
+                dispatch(recommendedVideosFetched(response));
             })
             .catch((error) => {
                 return Promise.resolve(); // TODO: we need a promise here because of the tests, find a better way

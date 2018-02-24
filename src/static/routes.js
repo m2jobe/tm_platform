@@ -5,9 +5,9 @@ import requireAuthentication from './utils/requireAuthentication';
 
 export default(
     <Switch>
-        <Route exact path="/" component={HomeView} />
-        <Route exact path="/player" component={PlayerView} />
-        <Route exact path="/app" component={MainView} />
+        {/*<Route exact path="/" component={HomeView} />*/}
+        <Route exact path="/player/:videoID" component={PlayerView} />
+        <Route exact path="/" component={MainView} />
         <Route path="/login" component={LoginView} />
         <Route path="/protected" component={requireAuthentication(ProtectedView)} />
         <Route path="*" component={NotFoundView} />

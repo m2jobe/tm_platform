@@ -1,3 +1,11 @@
+.btn-primary {
+  border-color: transparent !important;
+}
+
+.ReactModal__Overlay {
+  z-index: 100000;
+}
+
 .page-logo {
   max-width: 200px;
 }
@@ -83,7 +91,7 @@ footer p {
 .thumb a {position: absolute; top: 0; display: block; width: 100%; height: 100%; text-align: center; text-decoration: none;}
 .thumb a .play, .thumb a .overlay {opacity: 0;}
 .thumb a:hover .play, .thumb a:hover .overlay {display: block; transition: opacity .25s ease-in-out;-moz-transition: opacity .25s ease-in-out;-webkit-transition: opacity .25s ease-in-out;}
-.thumb a:hover .play {position: relative; font-size: 64px; color: #ffffff; margin-top: 60px; z-index: 1000; opacity: 1;}
+.thumb a:hover .play {position: absolute;; font-size: 64px; color: #ffffff; top: 50%; left: 50%; z-index: 1000; opacity: 1;transform: translate(-50%, -50%); display: inline-block}
 .thumb a:hover .overlay {position: absolute; top: 0; width: 100%; height: 100%; background-color: #000000; opacity: .7;}
 
 .ReactModal__Content {
@@ -219,4 +227,177 @@ footer p {
 
 .play:hover {
   cursor: pointer
+}
+
+.header {
+  background-image: url(./images/handsup.jpg);
+}
+
+
+///comment boxShadow
+.input-group{
+    width: 100%
+}
+.main-footer {
+    width:100%;
+}
+.main-sidebar{
+    position: fixed;
+}
+
+.direct-chat-messages{
+    height: 64vh
+}
+
+.text-area{
+    width: 100% !important;
+    height: 100px !important;
+}
+//
+
+//from djr commentText
+
+.card {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border:none !important;
+}
+
+.item-card .card__image {
+    background-color: #ef5350 !important;
+}
+
+.featured-live-event img {
+  height: 60vh;
+}
+
+.tm-thumbnail {
+  margin-bottom: 4vh;
+}
+
+.card .card-image img {
+    width: auto !important;
+}
+
+.commentBox {
+  padding: 0px !important;
+  list-style: none !important;
+  min-height: 10vh;
+  overflow: auto;
+}
+
+.comment {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.commentText, {
+  margin-left: 3vh;
+  width: 100%;
+  font-size: 16px;
+}
+
+
+.commentDate {
+  width: 100%;
+  font-size: 16px;
+  color: '#cccccc';
+}
+
+.commentDiv {
+  padding: 25px;
+}
+
+time {
+  float: right;
+}
+
+.makeComment {
+  width: 100%;
+  display: flex;
+  padding: 10px !important;
+
+}
+
+
+
+.commentButton {
+  width: 24vh;
+  float: right;
+  background-color: white !important;
+}
+
+///might cause issues ^
+
+.card {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border:none !important;
+}
+
+.item-card .card__image {
+    background-color: #ef5350 !important;
+}
+
+.featured-live-event img {
+  height: 60vh;
+}
+
+.tm-thumbnail {
+  margin-bottom: 4vh;
+}
+
+.card .card-image img {
+    width: auto !important;
+}
+
+.commentBox {
+  padding: 0px !important;
+  list-style: none !important;
+  min-height: 10vh;
+  overflow: auto;
+  max-height: 100vh;
+}
+
+.comment {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.commentText, {
+  margin-left: 3vh;
+  width: 100%;
+  font-size: 16px;
+}
+
+
+.commentDate {
+  width: 100%;
+  font-size: 16px;
+  color: '#cccccc';
+}
+
+.commentDiv {
+  padding: 25px;
+}
+
+time {
+  float: right;
+}
+
+.makeComment {
+  width: 100%;
+  display: flex;
+  padding: 10px !important;
+
+}
+
+
+
+.commentButton {
+  width: 24vh;
+  float: right;
+  background-color: white !important;
 }
