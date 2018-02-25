@@ -68,6 +68,31 @@ function getCookie(name) {
     return cookieValue;
 }
 
+
+export function triggerLike(videoID, count) {
+    return (dispatch, state) => {
+      return fetch(`${SERVER_URL}/api/v1/content/triggerLike/`, {
+          method: 'post',
+          credentials: "same-origin",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              //"X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({videoID: videoID, count: count})
+      })
+            .then(checkHttpStatus)
+            .then(parseJSON)
+            .then((response) => {
+              alert("Gotcha!");
+                //dispatch(videoFetched(response));
+            })
+            .catch((error) => {
+                return Promise.resolve(); // TODO: we need a promise here because of the tests, find a better way
+            });
+    };
+}
+
 export function fetchVideo(videoID) {
     return (dispatch, state) => {
       return fetch(`${SERVER_URL}/api/v1/content/fetchVideo/`, {

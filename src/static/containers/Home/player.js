@@ -57,6 +57,7 @@ class PlayerView extends React.Component {
         modalIsOpen: false,
         currentURL: "",
         isFull: false,
+        liked: 0
       };
 
       this.afterOpenModal = this.afterOpenModal.bind(this);
@@ -66,10 +67,23 @@ class PlayerView extends React.Component {
 
       this.submitMessage = this.submitMessage.bind(this)
       this.goToMain = this.goToMain.bind(this)
+      this.toggleLike = this.toggleLike.bind(this)
 
     }
 
-
+    toggleLike() {
+      if(this.state.liked == 0) {
+        this.props.actions.triggerLike(this.props.match.params.videoID, 1);
+        $('#likebutton').text("Loved it!");
+        $('#likebuttonicon').text("❤️");
+        this.setState({liked:1})
+      } else {
+        this.props.actions.triggerLike(this.props.match.params.videoID, -1);
+        $('#likebutton').text("Not for me!");
+        $('#likebuttonicon').text("💔");
+        this.setState({liked:0})
+      }
+    }
       submitMessage(){
         var messageToSend = $('#messageToSend').val().trim();
         if(!messageToSend) {
@@ -234,6 +248,19 @@ class PlayerView extends React.Component {
                       </div>
                       <div className="card-footer text-muted">
                         Streamed on {this.props.fetchedVideo[0].streamDate}
+                        <br/><br/><hr/><br/>
+                        <p>
+                          <a id="likebutton" onClick={this.toggleLike} title="Love it" className="lovebtn lovebtn-counter" data-count={this.state.liked}><span id="likebuttonicon">❤️</span> Love it</a>
+                        </p>
+                        <br/>
+                        <div className="tab-pane active" id={"profile1"}>
+                          <button style={{border: 'none'}} className="btn btn-primary btn-round">
+                            <i className="material-icons">remove_red_eyes</i> {this.props.fetchedVideo[0].streamViews} Views
+                          </button>
+                          <button  style={{border: 'none'}} className="btn btn-primary btn-round">
+                            <i className="material-icons">star</i> {this.props.fetchedVideo[0].streamLikes} Likes
+                          </button>
+                        </div>
                       </div>
                     </div>
 

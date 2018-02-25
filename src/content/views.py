@@ -67,6 +67,19 @@ class FetchVideo(GenericAPIView):
 
         return Response(data, status=status.HTTP_200_OK)
 
+class TriggerLike(GenericAPIView):
+    authentication_classes = ()
+    serializer_class = VideoThumbnailSerializer
+
+    def post(self, request):
+        """Process GET request and return protected data."""
+        video = Video.objects.get(streamURL=request.data['videoID'])
+        video.streamLikes = video.streamLikes + request.data['count'];
+
+        video.save()
+
+        return Response("woo", status=status.HTTP_200_OK)
+
 
 class FetchRecommendations(GenericAPIView):
     authentication_classes = ()

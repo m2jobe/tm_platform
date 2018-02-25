@@ -20,4 +20,7 @@ urlpatterns = [
     url(_(r'^fetchVideo/$'),
         csrf_exempt(content.views.FetchVideo.as_view()),
         name='fetchVideo'),
+    url(_(r'^triggerLike/$'),
+        csrf_exempt(content.views.TriggerLike.as_view()),
+        name='triggerLike'),
 ]

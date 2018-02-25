@@ -19,6 +19,9 @@ import firebase from 'firebase';
 import { compose } from 'redux';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
+import Loader from 'react-loader-advanced';
+
+
 const customStyles = {
   content : {
     top                   : '50%',
@@ -537,10 +540,13 @@ class MainView extends React.Component {
                          </div>
                        )
                      },this)}
-
                     </div>
                     :
-                    null
+                    <Loader show={true} message={      <div> Loading Streams... </div>}>
+                    <div style={{width:'90%', height:'40vh'}}>
+                    </div>
+                    </Loader>
+
                   }
                   </div>
                 </div>
@@ -562,7 +568,7 @@ class MainView extends React.Component {
                         <i className="fa fa-facebook-square" />
                         Like
                       </a>
-                      <a href="instagram.com/tourmonkeys" target="_blank" className="btn btn-google-plus">
+                      <a href="https://www.instagram.com/tourmonkeys" target="_blank" className="btn btn-google-plus">
                         <i className="fa fa-instagram" />
                         Follow
                       </a>
@@ -575,29 +581,14 @@ class MainView extends React.Component {
                   <nav className="pull-left">
                     <ul>
                       <li>
-                        <a href="http://www.creative-tim.com">
-                          Creative Tim
-                        </a>
-                      </li>
-                      <li>
-                        <a href="http://presentation.creative-tim.com">
-                          About Us
-                        </a>
-                      </li>
-                      <li>
-                        <a href="http://blog.creative-tim.com">
-                          Blog
-                        </a>
-                      </li>
-                      <li>
-                        <a href="http://www.creative-tim.com/license">
-                          Licenses
+                        <a href="http://www.tourmonkeys.com">
+                          Tourmonkeys
                         </a>
                       </li>
                     </ul>
                   </nav>
                   <div className="copyright pull-right">
-                    © 2016, made with <i className="material-icons">favorite</i> by Creative Tim for a better web.
+                    © 2017, made with <i className="material-icons">favorite</i> by Tourmonkeys Team.
                   </div>
                 </div>
               </footer>
