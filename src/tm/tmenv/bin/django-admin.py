@@ -1,4 +1,4 @@
-#!/home/muhammed/Documents/tm/tm-platform/src/tm/tmenv/bin/python3
+#!/home/ubuntu/tm_platform/src/tm/tmenv/bin/python3
 from django.core import management
 
 if __name__ == "__main__":

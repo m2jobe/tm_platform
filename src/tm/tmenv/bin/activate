@@ -40,7 +40,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/muhammed/Documents/tm/tm-platform/src/tm/tmenv"
+VIRTUAL_ENV="/home/ubuntu/tm_platform/src/tm/tmenv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

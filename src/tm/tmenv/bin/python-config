@@ -1,4 +1,4 @@
-#!/home/muhammed/Documents/tm/tm-platform/src/tm/tmenv/bin/python
+#!/home/ubuntu/tm_platform/src/tm/tmenv/bin/python
 
 import sys
 import getopt

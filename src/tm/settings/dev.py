@@ -4,6 +4,7 @@ from tm.settings.base import *  # NOQA (ignore all errors on this line)
 DEBUG = True
 
 PAGE_CACHE_SECONDS = 1
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
