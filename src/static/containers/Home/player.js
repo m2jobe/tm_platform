@@ -229,7 +229,7 @@ class PlayerView extends React.Component {
                   }}
                   playerId='1'
                   playerScript='https://content.jwplatform.com/libraries/yJ29b8c4.js'
-                  playlist={'http://content.jwplatform.com/feeds/'+this.props.fetchedVideo[0].streamURL+'.json'}
+                  playlist={'https://content.jwplatform.com/feeds/'+this.props.fetchedVideo[0].streamURL+'.json'}
                 />
               </div>
             </div>
@@ -280,7 +280,7 @@ class PlayerView extends React.Component {
                                    <span className="play">►</span>
                                    <div className="overlay" />
                                  </a>
-                                 <img src={"http://content.jwplatform.com/thumbs/"+video.streamURL+"-720.jpg"} alt="Raised Image" className="img-rounded img-responsive img-raised" />
+                                 <img src={"https://content.jwplatform.com/thumbs/"+video.streamURL+"-720.jpg"} alt="Raised Image" className="img-rounded img-responsive img-raised" />
                                </div>
                              </div>
                              {/* Tabs with icons on Card */}

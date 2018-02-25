@@ -407,7 +407,7 @@ class MainView extends React.Component {
                                  <span className="play">►</span>
                                  <div className="overlay" />
                                </a>
-                               <img style={{width:'100%', height:'100%'}} src={"http://content.jwplatform.com/thumbs/"+video.streamURL+"-720.jpg"} alt={video.streamName} className="img-rounded img-responsive img-raised" />
+                               <img style={{width:'100%', height:'100%'}} src={"https://content.jwplatform.com/thumbs/"+video.streamURL+"-720.jpg"} alt={video.streamName} className="img-rounded img-responsive img-raised" />
                              </div>
                            </div>
                            {/* Tabs with icons on Card */}
@@ -486,7 +486,7 @@ class MainView extends React.Component {
                                  <span className="play">►</span>
                                  <div className="overlay" />
                                </a>
-                               <img src={"http://content.jwplatform.com/thumbs/"+video.streamURL+"-720.jpg"} alt="Raised Image" className="img-rounded img-responsive img-raised" />
+                               <img src={"https://content.jwplatform.com/thumbs/"+video.streamURL+"-720.jpg"} alt="Raised Image" className="img-rounded img-responsive img-raised" />
                              </div>
                            </div>
                            {/* Tabs with icons on Card */}
@@ -581,7 +581,7 @@ class MainView extends React.Component {
                   <nav className="pull-left">
                     <ul>
                       <li>
-                        <a href="http://www.tourmonkeys.com">
+                        <a href="https://www.tourmonkeys.com">
                           Tourmonkeys
                         </a>
                       </li>
