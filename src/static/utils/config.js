@@ -1,4 +1,4 @@
-export const SERVER_URL = 'http://tourmonkeys.com';
+export const SERVER_URL = 'https://tourmonkeys.com';
 
 // config should use named export as there can be different exports,
 // just need to export default also because of eslint rules
