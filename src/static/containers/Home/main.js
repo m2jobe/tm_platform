@@ -20,6 +20,7 @@ import { compose } from 'redux';
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import Loader from 'react-loader-advanced';
+import Avatar from 'react-avatar';
 
 
 const customStyles = {
@@ -339,29 +340,29 @@ class MainView extends React.Component {
             </Modal>
             <nav className="navbar navbar-transparent navbar-fixed-top navbar-color-on-scroll">
               <div className="container">
-                <div className="navbar-header">
-                  <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#navigation-index">
-                    <span className="sr-only">Toggle navigation</span>
-                    <span className="icon-bar" />
-                    <span className="icon-bar" />
-                    <span className="icon-bar" />
-                  </button>
-                  <a href="#">
-                    <div className="logo-container">
-                      <div className="logo">
-                        <img src={tourLogo} alt="Tourmonkeys Livesteam Logo" data-placement="bottom" data-html="true" />
-                      </div>
-                    </div>
-                  </a>
-                </div>
                 <div className="collapse navbar-collapse" id="navigation-index">
+                  <div className="navbar-header">
+                    <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#navigation-index">
+                      <span className="sr-only">Toggle navigation</span>
+                      <span className="icon-bar" />
+                      <span className="icon-bar" />
+                      <span className="icon-bar" />
+                    </button>
+                    <a href="#">
+                      <div className="logo-container">
+                        <div className="logo">
+                          <img src={tourLogo} alt="Tourmonkeys Livesteam Logo" data-placement="bottom" data-html="true" />
+                        </div>
+                      </div>
+                    </a>
+                  </div>
                   <div className="nav navbar-nav navbar-right">
                     <li>
                       {this.props.firebase.auth.email ?
-                        <a onClick={this.openModal3}><i className="material-icons">face</i>
-                        {this.props.firebase.auth.displayName
+                        <a onClick={this.openModal3}>
+                        {this.props.firebase.auth.photoURL
                           ?
-                          this.props.firebase.auth.displayName
+                          <Avatar  src={this.props.firebase.auth.photoURL} />
                           :
                           this.props.firebase.auth.email
                         }
@@ -390,12 +391,12 @@ class MainView extends React.Component {
                 </div>
               </div>
               <div className="main main-raised">
+                {this.props.upcomingStreams && this.props.upcomingStreams.length > 0 ?
                 <div className="section section-basic">
                   <div className="container">
                     <div className="title">
                       <h2>Upcoming Livestreams</h2>
                     </div>
-                    {this.props.upcomingStreams  ?
                     <div className="row">
                     {this.props.upcomingStreams.map(function(video, idx){
                        return (
@@ -463,12 +464,12 @@ class MainView extends React.Component {
                      },this)}
 
                     </div>
-                    :
-                    null
-                  }
+
                   </div>
                 </div>
-
+                :
+                null
+              }
                 <div className="section section-basic">
                   <div className="container">
                     <div className="title">
