@@ -3,14 +3,16 @@ import {
     REQUEST_LIVESTREAWM,
     HOME_LIVESTREAM_FETCHED,
     RECOMMENDED_LIVESTREAM_FETCHED,
-    VIDEO_FETCHED
+    VIDEO_FETCHED,
+    VIDEO_LIKED_DATA
 } from '../constants';
 
 const initialState = {
     homeVideos: null,
     livestreamRequested: null,
     recommendedVideos: null,
-    fetchedVideo:null
+    fetchedVideo:null,
+    videoLikedData: null
 };
 
 export default function homeReducer(state = initialState, action) {
@@ -34,6 +36,10 @@ export default function homeReducer(state = initialState, action) {
         case VIDEO_FETCHED:
             return Object.assign({}, state, {
                 fetchedVideo: action.payload.data,
+            });
+        case VIDEO_LIKED_DATA:
+            return Object.assign({}, state, {
+                videoLikedData: action.payload.data,
             });
         default:
             return state;

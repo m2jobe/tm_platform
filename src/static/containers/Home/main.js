@@ -21,6 +21,19 @@ import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import Loader from 'react-loader-advanced';
 import Avatar from 'react-avatar';
+import Autosuggest from 'react-autosuggest';
+
+// Imagine you have a list of languages that you'd like to autosuggest.
+const languages = [
+  {
+    name: 'C',
+    year: 1972
+  },
+  {
+    name: 'Elm',
+    year: 2012
+  }
+];
 
 
 const customStyles = {
@@ -54,7 +67,10 @@ class MainView extends React.Component {
         modalIsOpen: false,
         modalIsOpen2: false,
         modalIsOpen3: false,
-        currentURL: ""
+        modalIsOpen4: false,
+        currentURL: "",
+        value: '',
+        suggestions: []
       };
 
       this.playVideo = this.playVideo.bind(this);
@@ -66,11 +82,45 @@ class MainView extends React.Component {
       this.closeModal3 = this.closeModal3.bind(this);
       this.openModal3 = this.openModal3.bind(this);
       this.requestLivestream = this.requestLivestream.bind(this);
+      this.getSuggestions = this.getSuggestions.bind(this);
+
+      this.afterOpenModal4 = this.afterOpenModal4.bind(this);
+      this.closeModal4 = this.closeModal4.bind(this);
+      this.openModal4 = this.openModal4.bind(this);
+      this.goToX = this.goToX.bind(this);
 
     }
 
+    // Teach Autosuggest how to calculate suggestions for any given input value.
+    getSuggestions = (value) => {
+      var inputValue = value.trim().toLowerCase();
+      var inputLength = inputValue.length;
 
+      return inputLength === 0 ? [] : this.props.homeVideos.filter(lang =>
+        lang.streamName.toLowerCase().slice(0, inputLength) === inputValue
+      );
+    };
 
+    onChange = (event, { newValue }) => {
+      this.setState({
+        value: newValue
+      });
+    };
+
+    // Autosuggest will call this function every time you need to update suggestions.
+    // You already implemented this logic above, so just use it.
+    onSuggestionsFetchRequested = ({ value }) => {
+      this.setState({
+        suggestions: this.getSuggestions(value)
+      });
+    };
+
+    // Autosuggest will call this function every time you need to clear suggestions.
+    onSuggestionsClearRequested = () => {
+      this.setState({
+        suggestions: []
+      });
+    };
 
 
     login = () => {
@@ -105,6 +155,9 @@ class MainView extends React.Component {
 
     }
 
+    goToX(path) {
+      this.props.dispatch(push(path));
+    }
 
     playVideo(streamURL) {
       //window.location.replace("player/"+streamURL)
@@ -143,6 +196,19 @@ class MainView extends React.Component {
       // references are now sync'd and can be accessed.
     }
 
+    openModal4() {
+      this.setState({modalIsOpen4: true});
+    }
+
+
+    closeModal4() {
+      this.setState({modalIsOpen4: false});
+    }
+
+    afterOpenModal4() {
+      // references are now sync'd and can be accessed.
+    }
+
     static defaultProps = {
         statusText: '',
         userName: '',
@@ -169,12 +235,13 @@ class MainView extends React.Component {
 
     componentDidUpdate(prevProps, prevState){
       if(prevProps.livestreamRequested != this.props.livestreamRequested) {
-        alert("Request sent.");
-        window.location.reload();
+        NotificationManager.success("Request sent.", '');
+
       }
       if(prevProps.firebase.authError != this.props.firebase.authError) {
-        NotificationManager.success(this.props.firebase.authError.message, 'Error authenticating');
+        NotificationManager.error(this.props.firebase.authError.message, 'Error authenticating');
       }
+
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -189,19 +256,6 @@ class MainView extends React.Component {
       }
     }
 
-    requestLivestream() {
-      var artistName = $('#artistName').val();
-      var eventDate = $('#eventDate').val();
-      var eventLocation = $('#eventLocation').val();
-      var userEmail = $('#userEmail').val();
-
-      if(artistName !== "" && eventDate !== "" && eventLocation !== "" && userEmail !== "") {
-        this.props.actions.requestLivestream(artistName, userEmail, eventDate, eventLocation);
-      } else {
-        alert("Please don't leave any fields empty!");
-      }
-
-    }
 
     logout = () => {
         firebase.logout()
@@ -224,6 +278,23 @@ class MainView extends React.Component {
       });
     }
 
+    requestLivestream () {
+      var userEmail = $('#requestEmail').val();
+      var eventDate = $('#requestDate').val();
+      var eventLocation = $('#requestLocation').val();
+      var artistName = $('#requestArtist').val();
+
+
+      if(artistName !== "" && eventDate !== "" && eventLocation !== "" && userEmail !== "") {
+        this.props.actions.requestLivestream(artistName, userEmail, eventDate, eventLocation);
+      } else {
+        NotificationManager.warning("Please don't leave any fields empty!", '');
+
+      }
+
+
+    }
+
     render() {
         var myBigGreenDialog = {
           backgroundColor: '#00897B',
@@ -234,8 +305,70 @@ class MainView extends React.Component {
           marginLeft: '-35%',
         };
 
+        const { value, suggestions } = this.state;
+
+        // When suggestion is clicked, Autosuggest needs to populate the input
+        // based on the clicked suggestion. Teach Autosuggest how to calculate the
+        // input value for every given suggestion.
+        const getSuggestionValue = suggestion => suggestion.streamName;
+
+        // Use your imagination to render suggestions.
+        const renderSuggestion = suggestion => (
+          <div>
+            <a onClick={() => this.goToX('/player/'+suggestion.streamURL)}>
+            {suggestion.streamName}
+            </a>
+          </div>
+        );
+
+        // Autosuggest will pass through all these props to the input.
+        const inputProps = {
+          placeholder: 'Search for a stream...',
+          value,
+          onChange: this.onChange
+        };
+
         return (
           <div>
+            <Modal
+              ariaHideApp={false}
+              isOpen={this.state.modalIsOpen4}
+              onAfterOpen={this.afterOpenModal4}
+              onRequestClose={this.closeModal4}
+              style={customStyles}
+              contentLabel="Request Stream"
+            >
+              <div style={{maxWidth: '70vw'}} className="container">
+              <button onClick={this.closeModal4} type="button" style={{padding:'1vh', fontSize:'16px'}} className="close pull-right" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                <div  className="row">
+                  <div className="modal-body">
+                    <div className="form-group">
+                      <label htmlFor="requestEmail">Email address</label>
+                      <input type="email" className="form-control" id="requestEmail" aria-describedby="emailHelp" placeholder="Enter your email" />
+                      <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="requestArtist">Artist Name</label>
+                      <input type="text" className="form-control" id="requestArtist" placeholder="What's the name of the Artist?" />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="requestDate">Event Date</label>
+                      <input type="text" className="form-control" id="requestDate" placeholder="When is the event?" />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="requestLocation">Event Location</label>
+                      <input type="text" className="form-control" id="requestLocation" placeholder="Where is the event taking place?" />
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" onClick={this.requestLivestream} className="btn btn-danger btn-link">Request<div className="ripple-container" /></button>
+                  </div>
+                </div>
+              </div>
+            </Modal>
+
             <Modal
               ariaHideApp={false}
               isOpen={this.state.modalIsOpen3}
@@ -359,15 +492,19 @@ class MainView extends React.Component {
                   <div className="nav navbar-nav navbar-right">
                     <li>
                       {this.props.firebase.auth.email ?
+                        <div className="row" >
+                        <div className="col-sm-4">
                         <a onClick={this.openModal3}>
                         {this.props.firebase.auth.photoURL
                           ?
-                          <Avatar  src={this.props.firebase.auth.photoURL} />
+                          <Avatar size={50} src={this.props.firebase.auth.photoURL} />
                           :
                           this.props.firebase.auth.email
                         }
 
                         </a>
+                        </div>
+                        </div>
                         :
                         <a onClick={this.openModal2}><i className="material-icons">face</i> login</a>
                       }
@@ -381,10 +518,30 @@ class MainView extends React.Component {
               <div className="header header-filter">
                 <div className="container">
                   <div className="row">
-                    <div className="col-md-8 col-md-offset-2">
+                    <div className="col-md-12">
                       <div className="brand">
                         <h1>Tourmonkeys.</h1>
-                        <h3>Watch Performances Live and On Demand!</h3>
+                        <h3>Watch Performances Live and On Demand!</h3><br/>
+                        {this.props.homeVideos ?
+                        <div >
+                          <Autosuggest
+                            suggestions={suggestions}
+                            onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                            onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                            getSuggestionValue={getSuggestionValue}
+                            renderSuggestion={renderSuggestion}
+                            inputProps={inputProps}
+                          />
+                          <br/>
+
+                          <br/>
+                          <h5> Can't find the stream you're looking for <i className="fa fa-question"></i> </h5>
+
+                          <button onClick={this.openModal4} className="btn btn-primary">Request a stream</button>
+                        </div>
+                        :
+                        null
+                        }
                       </div>
                     </div>
                   </div>

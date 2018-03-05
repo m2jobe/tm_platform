@@ -3,7 +3,7 @@ import { push } from 'react-router-redux';
 
 import { SERVER_URL } from '../utils/config';
 import { checkHttpStatus, parseJSON } from '../utils';
-import { VIDEO_FETCHED, RECOMMENDED_LIVESTREAM_FETCHED, HOME_LIVESTREAM_FETCHED, REQUEST_LIVESTREAWM, HOME_VIDEOS_FETCHED } from '../constants';
+import { VIDEO_LIKED_DATA,VIDEO_FETCHED, RECOMMENDED_LIVESTREAM_FETCHED, HOME_LIVESTREAM_FETCHED, REQUEST_LIVESTREAWM, HOME_VIDEOS_FETCHED } from '../constants';
 
 
 export function homeVideosFetched(data) {
@@ -52,6 +52,16 @@ export function requestLivestreamSent(data) {
     };
 }
 
+export function videoLikedData(data) {
+    return {
+        type: VIDEO_LIKED_DATA,
+        payload: {
+            data
+        }
+    };
+}
+
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
@@ -69,7 +79,31 @@ function getCookie(name) {
 }
 
 
-export function triggerLike(videoID, count) {
+export function getVideoLikes(videoID, user_email) {
+    return (dispatch, state) => {
+      return fetch(`${SERVER_URL}/api/v1/content/getVideoLikes/`, {
+          method: 'post',
+          credentials: "same-origin",
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              //"X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({videoID: videoID, user_email: user_email})
+      })
+            .then(checkHttpStatus)
+            .then(parseJSON)
+            .then((response) => {
+              dispatch(videoLikedData(response));
+            })
+            .catch((error) => {
+                return Promise.resolve(); // TODO: we need a promise here because of the tests, find a better way
+            });
+    };
+}
+
+
+export function triggerLike(videoID, user_email) {
     return (dispatch, state) => {
       return fetch(`${SERVER_URL}/api/v1/content/triggerLike/`, {
           method: 'post',
@@ -79,12 +113,12 @@ export function triggerLike(videoID, count) {
               'Content-Type': 'application/json',
               //"X-CSRFToken": getCookie("csrftoken"),
           },
-          body: JSON.stringify({videoID: videoID, count: count})
+          body: JSON.stringify({videoID: videoID, user_email: user_email})
       })
             .then(checkHttpStatus)
             .then(parseJSON)
             .then((response) => {
-              alert("Gotcha!");
+              //alert("Gotcha!");
                 //dispatch(videoFetched(response));
             })
             .catch((error) => {

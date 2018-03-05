@@ -23,4 +23,7 @@ urlpatterns = [
     url(_(r'^triggerLike/$'),
         csrf_exempt(content.views.TriggerLike.as_view()),
         name='triggerLike'),
+    url(_(r'^getVideoLikes/$'),
+        csrf_exempt(content.views.GetVideoLikes.as_view()),
+        name='getVideoLikes'),
 ]

@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from content.models import Video
+from content.models import Likes
 
 from content.serializers import VideoThumbnailSerializer
 from content.serializers import VideoSerializer
@@ -73,12 +74,26 @@ class TriggerLike(GenericAPIView):
 
     def post(self, request):
         """Process GET request and return protected data."""
-        video = Video.objects.get(streamURL=request.data['videoID'])
-        video.streamLikes = video.streamLikes + request.data['count'];
+        likes = Likes.objects.filter(user_email=request.data['user_email']).filter(stream_url=request.data['videoID'])
+        response = "";
+        if(likes):
 
-        video.save()
+            likes.delete()
+            video = Video.objects.get(streamURL=request.data['videoID'])
+            video.streamLikes = video.streamLikes - 1;
+            video.save()
+            response = "unliked"
+        else :
+            l = Likes(user_email=request.data['user_email'], stream_url=request.data['videoID'])
+            l.save()
+            video = Video.objects.get(streamURL=request.data['videoID'])
+            video.streamLikes = video.streamLikes + 1;
+            video.save()
+            reponse = "liked"
 
-        return Response("woo", status=status.HTTP_200_OK)
+
+        return Response(response, status=status.HTTP_200_OK)
+
 
 
 class FetchRecommendations(GenericAPIView):
@@ -106,3 +121,20 @@ class RequestLivestream(GenericAPIView):
         request.save()
 
         return Response("success", status=status.HTTP_200_OK)
+
+
+class GetVideoLikes(GenericAPIView):
+    authentication_classes = ()
+    serializer_class = VideoThumbnailSerializer
+
+    def post(self, request):
+        """Process GET request and return protected data."""
+        likes = Likes.objects.filter(user_email=request.data['user_email']).filter(stream_url=request.data['videoID'])
+        response = ""
+        if(likes):
+            response = "liked"
+        else :
+            reponse = "unliked"
+
+
+        return Response(response, status=status.HTTP_200_OK)

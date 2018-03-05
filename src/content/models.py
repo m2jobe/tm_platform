@@ -62,6 +62,24 @@ class Artist(models.Model ):
         return self.name
 
 
+class Likes(models.Model ):
+    """
+    Model that represents an video.
+    """
+
+    user_email = models.CharField(_('user_email'), max_length=150)
+    stream_url = models.URLField(_('stream_url'), max_length=200 )
+    date_added = models.DateTimeField(_('date joined'), auto_now_add=True)
+
+
+    def __str__(self):
+        """
+        Unicode representation for a like model.
+        :return: string
+        """
+        return self.id
+
+
 class Requests(models.Model ):
     """
     Model that represents an video.

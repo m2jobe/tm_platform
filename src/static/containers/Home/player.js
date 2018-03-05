@@ -45,8 +45,8 @@ class PlayerView extends React.Component {
         statusText: PropTypes.string,
         userName: PropTypes.string,
         dispatch: PropTypes.func.isRequired,
-        fetchedVideo: PropTypes.array
-
+        fetchedVideo: PropTypes.array,
+        videoLikedData : PropTypes.string
     };
 
     constructor() {
@@ -57,7 +57,10 @@ class PlayerView extends React.Component {
         modalIsOpen: false,
         currentURL: "",
         isFull: false,
-        liked: 0
+        liked: 0,
+        videoLikedData: null,
+        likebuttonicon: "❤️",
+        likebutton: "Love it"
       };
 
       this.afterOpenModal = this.afterOpenModal.bind(this);
@@ -73,15 +76,11 @@ class PlayerView extends React.Component {
 
     toggleLike() {
       if(this.state.liked == 0) {
-        this.props.actions.triggerLike(this.props.match.params.videoID, 1);
-        $('#likebutton').text("Loved it!");
-        $('#likebuttonicon').text("❤️");
-        this.setState({liked:1})
+        this.props.actions.triggerLike(this.props.match.params.videoID, this.props.firebase.auth.email);
+        this.setState({liked:1, likebuttonicon: "❤️", likebutton: "Loved it!" })
       } else {
-        this.props.actions.triggerLike(this.props.match.params.videoID, -1);
-        $('#likebutton').text("Not for me!");
-        $('#likebuttonicon').text("💔");
-        this.setState({liked:0})
+        this.props.actions.triggerLike(this.props.match.params.videoID, this.props.firebase.auth.email);
+        this.setState({liked:0, likebuttonicon: "💔",likebutton: "Not for me!"})
       }
     }
       submitMessage(){
@@ -158,6 +157,7 @@ class PlayerView extends React.Component {
     componentDidMount() {
       window.scrollTo(0, 0)
 
+
       console.log(this.props.match.params.videoID);
       firebase.database().ref('messages/'+this.props.match.params.videoID).on('value', (snapshot) => {
           const currentMessages = snapshot.val()
@@ -169,6 +169,9 @@ class PlayerView extends React.Component {
           }
       });
 
+      if(this.props.firebase.auth.email) {
+        this.props.actions.getVideoLikes(this.props.match.params.videoID, this.props.firebase.auth.email);
+      }
 
     }
 
@@ -176,11 +179,18 @@ class PlayerView extends React.Component {
 
     componentDidUpdate(prevProps, prevState){
       console.log(this.props.fetchedVideo);
+      if(prevProps.videoLikedData != this.props.videoLikedData) {
 
+        if(this.props.videoLikedData === "liked") {
+          this.setState({liked: 1, likebuttonicon:"❤️",likebutton:  "Loved it!" });
+        }
+      }
       if(!this.props.fetchedVideo) {
           //alert("Hey there! This video url doesn't seem to exist anymore, you will be redirected to the homepage.");
           //.location.replace("/app");
       }
+
+
     }
 
 
@@ -250,7 +260,7 @@ class PlayerView extends React.Component {
                         Streamed on {this.props.fetchedVideo[0].streamDate}
                         <br/><br/><hr/><br/>
                         <p>
-                          <a id="likebutton" onClick={this.toggleLike} title="Love it" className="lovebtn lovebtn-counter" data-count={this.state.liked}><span id="likebuttonicon">❤️</span> Love it</a>
+                          <a  onClick={this.toggleLike} title="Love it" className="lovebtn lovebtn-counter" data-count={this.state.liked}><span >{this.state.likebuttonicon}</span> {this.state.likebutton}</a>
                         </p>
                         <br/>
                         <div className="tab-pane active" id={"profile1"}>
@@ -417,6 +427,7 @@ const mapStateToProps = (state) => {
         fetchedVideo: state.home.fetchedVideo,
         statusText: state.auth.statusText,
         firebase: state.firebase,
+        videoLikedData: state.home.videoLikedData,
     };
 };
 
