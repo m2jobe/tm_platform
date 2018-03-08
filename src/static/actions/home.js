@@ -3,7 +3,7 @@ import { push } from 'react-router-redux';
 
 import { SERVER_URL } from '../utils/config';
 import { checkHttpStatus, parseJSON } from '../utils';
-import { VIDEO_LIKED_DATA,VIDEO_FETCHED, RECOMMENDED_LIVESTREAM_FETCHED, HOME_LIVESTREAM_FETCHED, REQUEST_LIVESTREAWM, HOME_VIDEOS_FETCHED } from '../constants';
+import { TRIGGER_LIKE_FEEDBACK,VIDEO_LIKED_DATA,VIDEO_FETCHED, RECOMMENDED_LIVESTREAM_FETCHED, HOME_LIVESTREAM_FETCHED, REQUEST_LIVESTREAWM, HOME_VIDEOS_FETCHED } from '../constants';
 
 
 export function homeVideosFetched(data) {
@@ -48,6 +48,15 @@ export function requestLivestreamSent(data) {
         type: REQUEST_LIVESTREAWM,
         payload: {
             data
+        }
+    };
+}
+
+export function triggerLikeFeedback(data) {
+    return {
+        type: TRIGGER_LIKE_FEEDBACK,
+        payload: {
+          data
         }
     };
 }
@@ -119,7 +128,7 @@ export function triggerLike(videoID, user_email) {
             .then(parseJSON)
             .then((response) => {
               //alert("Gotcha!");
-                //dispatch(videoFetched(response));
+                dispatch(triggerLikeFeedback(response));
             })
             .catch((error) => {
                 return Promise.resolve(); // TODO: we need a promise here because of the tests, find a better way

@@ -164,15 +164,21 @@ class MainView extends React.Component {
       if(this.props.firebase.auth.email) {
         this.props.dispatch(push('/player/'+streamURL));
       } else {
-        this.openModal2();
+        this.openModal2(streamURL);
         NotificationManager.warning("Login Now to watch", '');
       }
 
     }
 
-    openModal2() {
-      this.setState({modalIsOpen2: true});
+    openModal2(streamURL) {
+
+      if(streamURL) {
+        this.setState({modalIsOpen2: true, locationAfterLogin: streamURL});
+      } else {
+        this.setState({modalIsOpen2: true});
+      }
     }
+
 
 
     closeModal2() {
@@ -242,12 +248,16 @@ class MainView extends React.Component {
         NotificationManager.error(this.props.firebase.authError.message, 'Error authenticating');
       }
 
+
     }
 
     componentWillUpdate(nextProps, nextState) {
       if(!this.props.firebase.auth.email) {
         if(nextProps.firebase.auth.email && this.props.firebase.auth.email != nextProps.firebase.auth.email) {
           this.closeModal2();
+          if(this.state.locationAfterLogin) {
+          this.goToX('/player/'+this.state.locationAfterLogin)
+        }
         }
       } else {
         if(!nextProps.firebase.auth.email) {
@@ -439,7 +449,6 @@ class MainView extends React.Component {
                             <ul>
                               <li><a  onClick={() => firebase.login({ provider: 'facebook', type: 'popup' })}><i className="fa fa-facebook" /> Facebook</a></li>
                               <li><a  onClick={() => firebase.login({ provider: 'google', type: 'popup' })}><i className="fa fa-google-plus" /> Google+</a></li>
-                              <li><a  onClick={() => firebase.login({ provider: 'twitter', type: 'popup' })}><i className="fa fa-twitter" /> Twitter</a></li>
                             </ul>
                           </div>
                           <div className="clearfix" />
@@ -462,7 +471,6 @@ class MainView extends React.Component {
                             <ul>
                               <li><a  onClick={() => firebase.login({ provider: 'facebook', type: 'popup' })}><i className="fa fa-facebook" /> Facebook</a></li>
                               <li><a  onClick={() => firebase.login({ provider: 'google', type: 'popup' })}><i className="fa fa-google-plus" /> Google+</a></li>
-                              <li><a  onClick={() => firebase.login({ provider: 'twitter', type: 'popup' })}><i className="fa fa-twitter" /> Twitter</a></li>
                             </ul>
                           </div>
                         </div>
@@ -506,7 +514,7 @@ class MainView extends React.Component {
                         </div>
                         </div>
                         :
-                        <a onClick={this.openModal2}><i className="material-icons">face</i> login</a>
+                        <a onClick={() => this.openModal2(null)}><i className="material-icons">face</i> login</a>
                       }
                     </li>
                   </div>

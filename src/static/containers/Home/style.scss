@@ -154,7 +154,7 @@ footer p {
 	list-style-type:none;
 }
 .social-login ul li{
-	width:33%;
+	width:50%;
 	float:left;
     clear:fix;
 }
@@ -580,4 +580,11 @@ time {
 
 #react-autowhatever-1 {
   width: 100%;
+}
+
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 568px) { /* STYLES GO HERE */
+  .header-filter .container {
+    margin-bottom:10vh;
+  }
 }

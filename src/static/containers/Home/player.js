@@ -5,12 +5,6 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import * as actionCreators from '../../actions/home';
 import './style.scss';
-import reactLogo from './images/react-logo.png';
-import tourLogo from './images/tour-logo.png';
-import rockConcert from './images/rock-concert.jpg';
-import rockcert from './images/rockcert.jpg';
-import creatorDiv from './images/creatordiv.png';
-import ReactTooltip from 'react-tooltip'
 import Modal from 'react-modal';
 import TextOverflowTooltip from 'react-text-overflow-tooltip';
 import '../../../../node_modules/react-text-overflow-tooltip/lib/react-text-overflow-tooltip.css'
@@ -23,6 +17,7 @@ import {NotificationContainer, NotificationManager} from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import UserAvatar from 'react-user-avatar';
 import Moment from 'react-moment';
+import Loader from 'react-loader-advanced';
 
 const todosPath = 'chat';
 
@@ -46,11 +41,12 @@ class PlayerView extends React.Component {
         userName: PropTypes.string,
         dispatch: PropTypes.func.isRequired,
         fetchedVideo: PropTypes.array,
-        videoLikedData : PropTypes.string
+        videoLikedData : PropTypes.string,
+        triggerLikeFeedback: PropTypes.string
     };
 
-    constructor() {
-      super();
+    constructor(props) {
+      super(props);
 
 
       this.state = {
@@ -60,7 +56,10 @@ class PlayerView extends React.Component {
         liked: 0,
         videoLikedData: null,
         likebuttonicon: "❤️",
-        likebutton: "Love it"
+        likebutton: "Love it",
+        triggerLikeFeedback: '',
+        fetchLikesNow: true
+
       };
 
       this.afterOpenModal = this.afterOpenModal.bind(this);
@@ -150,7 +149,7 @@ class PlayerView extends React.Component {
     componentWillMount() {
       var videoID = this.props.match.params.videoID;
       this.props.actions.fetchVideo(videoID);
-      this.props.actions.fetchRecommendations("videoID",1);
+
 
     }
 
@@ -159,6 +158,9 @@ class PlayerView extends React.Component {
 
 
       console.log(this.props.match.params.videoID);
+
+
+
       firebase.database().ref('messages/'+this.props.match.params.videoID).on('value', (snapshot) => {
           const currentMessages = snapshot.val()
           console.log(currentMessages);
@@ -169,9 +171,6 @@ class PlayerView extends React.Component {
           }
       });
 
-      if(this.props.firebase.auth.email) {
-        this.props.actions.getVideoLikes(this.props.match.params.videoID, this.props.firebase.auth.email);
-      }
 
     }
 
@@ -185,12 +184,21 @@ class PlayerView extends React.Component {
           this.setState({liked: 1, likebuttonicon:"❤️",likebutton:  "Loved it!" });
         }
       }
-      if(!this.props.fetchedVideo) {
-          //alert("Hey there! This video url doesn't seem to exist anymore, you will be redirected to the homepage.");
-          //.location.replace("/app");
+
+      if(prevProps.triggerLikeFeedback != this.props.triggerLikeFeedback) {
+          this.props.actions.fetchVideo(this.props.match.params.videoID);
       }
 
+      if(prevProps.fetchedVideo == null && prevProps.fetchedVideo != this.props.fetchedVideo) {
+        this.props.actions.fetchRecommendations("videoID",1);
+      }
 
+      if(this.state.fetchLikesNow) {
+        if(this.props.firebase.auth.email) {
+          this.props.actions.getVideoLikes(this.props.match.params.videoID, this.props.firebase.auth.email);
+          this.setState({fetchLikesNow: false})
+        }
+      }
     }
 
 
@@ -207,7 +215,8 @@ class PlayerView extends React.Component {
     playVideo(streamURL) {
       //window.location.replace("player/"+streamURL)
       if(this.props.firebase.auth.email) {
-        this.props.dispatch(push('/player/'+streamURL));
+        //this.props.dispatch(push(streamURL));
+        window.location.replace(streamURL)
       } else {
         this.props.dispatch(push('/'));
         NotificationManager.warning("Not logged in", '');
@@ -276,7 +285,7 @@ class PlayerView extends React.Component {
 
                     <div className="">
                       <div className="title">
-                        <h2>Browse Streams</h2>
+                        <h2>Browse Similar Streams</h2>
                       </div>
                       {this.props.recommendedVideos ?
                       <div className=" align-items-start">
@@ -347,7 +356,10 @@ class PlayerView extends React.Component {
 
                       </div>
                       :
-                      null
+                      <Loader show={true} message={      <div> Loading Streams... </div>}>
+                      <div style={{width:'90%', height:'30vh'}}>
+                      </div>
+                      </Loader>
                     }
                     </div>
                   </div>
@@ -360,14 +372,14 @@ class PlayerView extends React.Component {
                  <br/><br/>
                  {(this.state.messages.length-1)==1 ?
                    <div>
-                       <h4> {this.state.messages.length} Comment </h4>
+                       <h4> {this.state.messages.length-1} Comment </h4>
                    </div>
                  :
                  null
                  }
                  {(this.state.messages.length-1)>1 ?
                    <div>
-                       <h4> {this.state.messages.length} Comments </h4>
+                       <h4> {this.state.messages.length-1} Comments </h4>
                    </div>
                  :
                  null
@@ -413,7 +425,10 @@ class PlayerView extends React.Component {
             </div>
             </div>
             :
-            null
+            <Loader show={true} message={      <div> Loading Streams... </div>}>
+            <div style={{width:'100%', height:'100%'}}>
+            </div>
+            </Loader>
             }
             <NotificationContainer/>
           </div>
@@ -428,6 +443,7 @@ const mapStateToProps = (state) => {
         statusText: state.auth.statusText,
         firebase: state.firebase,
         videoLikedData: state.home.videoLikedData,
+        triggerLikeFeedback: state.home.triggerLikeFeedback,
     };
 };
 
