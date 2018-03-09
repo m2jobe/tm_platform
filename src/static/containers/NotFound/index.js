@@ -15,7 +15,7 @@ export default class NotFoundView extends React.Component {
                     Sorry, an error has occured, Requested page not found!
                   </div>
                   <div className="error-actions">
-                    <a href="https://www.tourmonkeys.com" className="btn btn-primary btn-lg"><span className="glyphicon glyphicon-home" />
+                    <a href="https://tourmonkeys.com" className="btn btn-primary btn-lg"><span className="glyphicon glyphicon-home" />
                       Take Me Home </a>
                   </div>
                 </div>

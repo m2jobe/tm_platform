@@ -58,37 +58,63 @@ class PlayerView extends React.Component {
         likebuttonicon: "❤️",
         likebutton: "Love it",
         triggerLikeFeedback: '',
-        fetchLikesNow: true
+        fetchLikesNow: true,
+        modalIsOpen2: false,
 
       };
 
-      this.afterOpenModal = this.afterOpenModal.bind(this);
-      this.closeModal = this.closeModal.bind(this);
-      this.openModal = this.openModal.bind(this);
+
       this.playVideo = this.playVideo.bind(this)
 
       this.submitMessage = this.submitMessage.bind(this)
       this.goToMain = this.goToMain.bind(this)
       this.toggleLike = this.toggleLike.bind(this)
 
+      this.afterOpenModal2 = this.afterOpenModal2.bind(this);
+      this.closeModal2 = this.closeModal2.bind(this);
+      this.openModal2 = this.openModal2.bind(this);
     }
 
+    openModal2() {
+
+
+        this.setState({modalIsOpen2: true});
+    }
+
+
+
+    closeModal2() {
+      this.setState({modalIsOpen2: false});
+    }
+
+    afterOpenModal2() {
+      // references are now sync'd and can be accessed.
+    }
+
+
     toggleLike() {
-      if(this.state.liked == 0) {
-        this.props.actions.triggerLike(this.props.match.params.videoID, this.props.firebase.auth.email);
-        this.setState({liked:1, likebuttonicon: "❤️", likebutton: "Loved it!" })
-      } else {
-        this.props.actions.triggerLike(this.props.match.params.videoID, this.props.firebase.auth.email);
-        this.setState({liked:0, likebuttonicon: "💔",likebutton: "Not for me!"})
+      if(this.props.firebase.auth.email) {
+
+        if(this.state.liked == 0) {
+          this.props.actions.triggerLike(this.props.match.params.videoID, this.props.firebase.auth.email);
+          this.setState({liked:1, likebuttonicon: "❤️", likebutton: "Loved it!" })
+        } else {
+          this.props.actions.triggerLike(this.props.match.params.videoID, this.props.firebase.auth.email);
+          this.setState({liked:0, likebuttonicon: "💔",likebutton: "Not for me!"})
+        }
+      }else {
+        NotificationManager.warning('Please sign in to make a live comment!', 'Sign In', 3000);
+        this.openModal2();
       }
     }
       submitMessage(){
+        if(this.props.firebase.auth.email) {
+
         var messageToSend = $('#messageToSend').val().trim();
         if(!messageToSend) {
           NotificationManager.warning('Please type a message!', 'Oops', 3000);
 
         } else {
-          if(this.props.firebase.auth.email) {
             var id;
             if(this.state.messages) {
               id = this.state.messages.length;
@@ -115,26 +141,14 @@ class PlayerView extends React.Component {
             firebase.database().ref('messages/'+this.props.match.params.videoID+'/'+id).set(newMessage)
             $('#messageToSend').val('');
 
-          } else {
-            NotificationManager.warning('Please sign in to make a live comment!', 'Sign In', 3000);
 
-          }
+        }
+        }else {
+          NotificationManager.warning('Please sign in to make a live comment!', 'Sign In', 3000);
+          this.openModal2();
         }
     }
 
-    openModal() {
-      this.setState({modalIsOpen: true});
-    }
-
-    afterOpenModal() {
-      // references are now sync'd and can be accessed.
-    }
-
-
-
-    closeModal() {
-      this.setState({modalIsOpen: false});
-    }
 
 
 
@@ -151,6 +165,17 @@ class PlayerView extends React.Component {
       this.props.actions.fetchVideo(videoID);
 
 
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+      if(!this.props.firebase.auth.email) {
+        if(nextProps.firebase.auth.email && this.props.firebase.auth.email != nextProps.firebase.auth.email) {
+          NotificationManager.success("Logged in as " + nextProps.firebase.auth.email, '');
+          this.closeModal2();
+          window.scrollTo(0, 0)
+          this.props.actions.getVideoLikes(this.props.match.params.videoID, this.props.firebase.auth.email);
+        }
+      }
     }
 
     componentDidMount() {
@@ -224,12 +249,111 @@ class PlayerView extends React.Component {
 
     }
 
+    login = () => {
+        var password = $('#pwds').val();
+        var email = $('#usrd').val();
+        if (email && password) {
+            firebase.login({
+              email: email,
+              password: password
+            })
+        }
+    };
+
+    signUp = () => {
+      var password = $('#password').val();
+      var email = $('#email').val();
+      var displayName = $('#username').val();
+
+      if (username && password && email) {
+          //this.props.actions.authRegisterUser(email, password, password, username, this.state.redirectTo);
+          //delete above line
+          firebase.createUser(
+            { email, password },
+            { displayName, email }
+          )
+      }
+    }
+
 
     render() {
 
 
         return (
           <div className="container-fluid">
+            <Modal
+              ariaHideApp={false}
+              isOpen={this.state.modalIsOpen2}
+              onAfterOpen={this.afterOpenModal2}
+              onRequestClose={this.closeModal2}
+              style={customStyles}
+              contentLabel="Login Modal"
+            >
+              <div style={{width: 'max-content'}} className="container">
+              <button onClick={this.closeModal2} type="button" style={{padding:'1vh', fontSize:'16px'}} className="close pull-right" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                <div style={{paddingBottom:'20px'}} className="row">
+                    <div className="form-body">
+                      <ul style={{display:'-webkit-box !important'}} className="nav nav-tabs final-login">
+                        <li style={{display:'inline'}} className="active"><a data-toggle="tab" href="#sectionA">Sign In</a></li>
+                        <li style={{display:'inline'}} ><a data-toggle="tab" href="#sectionB">Join us!</a></li>
+                      </ul>
+                      <div className="tab-content">
+                        <div id="sectionA" className="tab-pane fade in active">
+                          <div className="innter-form">
+                            <div className="sa-innate-form" method="post">
+                              <label>Email Address</label>
+                              <input type="text" id="usrd" name="username" />
+                              <label>Password</label>
+                              <input type="password" id="pwds" name="password" />
+                              <button onClick={this.login} >Sign In</button><br/><br/>
+                              <a onClick={this.triggerForgotPassword}>Forgot Password?</a>
+                              <div style={{display:'none'}} id="triggerForgotDiv" >
+                                <br/><br/>
+                                <label>Enter Email Address to get recovery steps</label>
+                                <input type="text" id="recoveryEmail" name="recoveryEmail" />
+                                <button onClick={this.recoverPasword} >Recover Password</button>
+                                <br/><br/>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="social-login">
+                            <p>- - - - - - - - - - - - - Sign In With - - - - - - - - - - - - - </p>
+                            <ul>
+                              <li><a  onClick={() => firebase.login({ provider: 'facebook', type: 'popup' })}><i className="fa fa-facebook" /> Facebook</a></li>
+                              <li><a  onClick={() => firebase.login({ provider: 'google', type: 'popup' })}><i className="fa fa-google-plus" /> Google+</a></li>
+                            </ul>
+                          </div>
+                          <div className="clearfix" />
+                        </div>
+                        <div id="sectionB" className="tab-pane fade">
+                          <div className="innter-form">
+                            <div className="sa-innate-form" method="post">
+                              <label>Name</label>
+                              <input type="text" id="username" name="username" />
+                              <label>Email Address</label>
+                              <input type="text" id="email" name="email" />
+                              <label>Password</label>
+                              <input type="password" id="password" name="password" />
+                              <button onClick={this.signUp} >Join now</button><br/><br/>
+                              <p>By clicking Join now, you agree to hifriendss User Agreement, Privacy Policy, and Cookie Policy.</p>
+                            </div>
+                          </div>
+                          <div className="social-login">
+                            <p>- - - - - - - - - - - - - Register With - - - - - - - - - - - - - </p>
+                            <ul>
+                              <li><a  onClick={() => firebase.login({ provider: 'facebook', type: 'popup' })}><i className="fa fa-facebook" /> Facebook</a></li>
+                              <li><a  onClick={() => firebase.login({ provider: 'google', type: 'popup' })}><i className="fa fa-google-plus" /> Google+</a></li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </Modal>
+
             {this.props.fetchedVideo ?
               <div>
             <div style={{background:'black'}} className="row">
@@ -444,6 +568,8 @@ const mapStateToProps = (state) => {
         firebase: state.firebase,
         videoLikedData: state.home.videoLikedData,
         triggerLikeFeedback: state.home.triggerLikeFeedback,
+        auth: state.firebase.auth
+
     };
 };
 
