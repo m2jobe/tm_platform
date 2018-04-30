@@ -165,19 +165,6 @@ Here's a great article from digital ocean on how to deploy django project in a V
 
 
 
-## Screenshots
-
-Here are some screenshots of the boilerplate project.
-
-![Screenshot01][1]  
-
-[1]: ./screenshots/screenshot_01.png
-
-![Screenshot02][2]  
-
-[2]: ./screenshots/screenshot_02.png
-
-
 ## Gotchas in Docker
 
 * This project uses NodeJS v6.x (stable) and yarn
