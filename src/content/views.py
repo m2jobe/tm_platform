@@ -56,15 +56,12 @@ class FetchHomeVideo(GenericAPIView):
 class FetchVideo(GenericAPIView):
     authentication_classes = ()
     serializer_class = VideoThumbnailSerializer
-
+    
     def post(self, request):
-        """Process GET request and return protected data."""
+        """Process request and return video object."""
         queryset = Video.objects.filter(streamURL=request.data['videoID'])
         serializer = VideoThumbnailSerializer(queryset, many=True)
         data = serializer.data
-#        queryset = Objective.objects.filter(username=request.data['username'], date__lte=request.data['endDate'], date__gte = request.data['startDate']).order_by('-id')
-        #video = Video(name="asdf", artist='username', url="2015-05-05", description='objective', shots='note', date_added='2015-05-05 00:00:00', date_updated='2015-05-05 00:00:00')
-        #video.save()
 
         return Response(data, status=status.HTTP_200_OK)
 
