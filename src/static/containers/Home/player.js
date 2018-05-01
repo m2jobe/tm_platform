@@ -107,7 +107,8 @@ class PlayerView extends React.Component {
         this.openModal2();
       }
     }
-      submitMessage(){
+    
+    submitMessage(){
         if(this.props.firebase.auth.email) {
 
         var messageToSend = $('#messageToSend').val().trim();
