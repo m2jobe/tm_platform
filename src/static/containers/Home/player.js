@@ -163,8 +163,6 @@ class PlayerView extends React.Component {
     componentWillMount() {
       var videoID = this.props.match.params.videoID;
       this.props.actions.fetchVideo(videoID);
-
-
     }
 
     componentWillUpdate(nextProps, nextState) {
